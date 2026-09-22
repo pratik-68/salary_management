@@ -13,6 +13,9 @@ Rails.application.routes.draw do
 
       # The reference-data catalog behind the dropdowns.
       resource :meta, only: :show
+
+      # Both insight views, from one endpoint.
+      get "analytics/breakdown", to: "analytics#breakdown"
     end
   end
 
