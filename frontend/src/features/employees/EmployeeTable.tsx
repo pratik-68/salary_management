@@ -2,7 +2,7 @@
 // never sent 10,000 rows, so the table stays fast without any cached copy of
 // the data to keep in step with edits.
 
-import { Table, Tooltip } from 'antd'
+import { Button, Table, Tooltip } from 'antd'
 import type { TableProps } from 'antd'
 import type { Employee, EmployeeListParams, PageMeta, SortDirection } from '../../api/types'
 import { formatCount, formatDate, formatMoney } from '../../lib/format'
@@ -16,9 +16,17 @@ interface Props {
   loading: boolean
   params: EmployeeListParams
   onChange: (patch: Partial<EmployeeListParams>) => void
+  onEdit: (employee: Employee) => void
 }
 
-export default function EmployeeTable({ employees, meta, loading, params, onChange }: Props) {
+export default function EmployeeTable({
+  employees,
+  meta,
+  loading,
+  params,
+  onChange,
+  onEdit,
+}: Props) {
   // Sorting by salary needs one currency to sort within, so the column only
   // becomes sortable once the list is filtered to a country. The API enforces
   // the same rule; this is what stops the user finding out by hitting an error.
@@ -97,6 +105,19 @@ export default function EmployeeTable({ employees, meta, loading, params, onChan
       sorter: true,
       sortOrder: sortOrderFor('hire_date', params),
       render: (hireDate: string) => formatDate(hireDate),
+    },
+    {
+      title: '',
+      key: 'actions',
+      fixed: 'right',
+      width: 72,
+      render: (_, employee) => (
+        // The row already holds everything the form needs, so editing opens
+        // straight away rather than fetching the same record again.
+        <Button type="link" size="small" onClick={() => onEdit(employee)}>
+          Edit
+        </Button>
+      ),
     },
   ]
 

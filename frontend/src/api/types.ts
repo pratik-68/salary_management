@@ -90,3 +90,22 @@ export interface ReferenceData {
   job_titles: string[]
   levels: string[]
 }
+
+/**
+ * What the API accepts when creating or updating an employee.
+ *
+ * No currency: it is derived from the country, so sending it would let the two
+ * disagree. The API ignores it for the same reason.
+ */
+export interface EmployeeInput {
+  employee_code: string
+  first_name: string
+  last_name: string
+  email: string
+  country_code: string
+  department: string
+  job_title: string
+  level: string
+  annual_salary: number
+  hire_date: string
+}
