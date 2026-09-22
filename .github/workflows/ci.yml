@@ -1,0 +1,88 @@
+# The checks a commit has to pass, run on every push and pull request.
+#
+# They are the same commands the README gives for working locally, so a green
+# pipeline means "what I ran on my machine", not a second set of rules that
+# only CI knows about.
+#
+# Backend and frontend are separate jobs rather than steps of one: they share
+# no tooling, they run at the same time, and a Ruby failure and a TypeScript
+# failure are then two answers instead of whichever came first.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A new push to the same branch makes the previous run's answer irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (RSpec, RuboCop)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: backend
+          # The version comes from backend/.ruby-version, so the one file
+          # decides it here and on a developer's machine.
+          bundler-cache: true
+
+      # SQLite needs no service container: the test database is a file this
+      # step creates from db/schema.rb.
+      - name: Prepare the test database
+        run: bin/rails db:test:prepare
+
+      - name: Specs
+        run: bundle exec rspec
+
+      # After the specs: a style complaint is worth seeing, but a broken model
+      # is worth seeing first.
+      - name: RuboCop
+        run: bundle exec rubocop
+
+  frontend:
+    name: Frontend (tsc, oxlint, Vitest, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # ci, not install: the lockfile is installed exactly as committed, so a
+      # dependency cannot drift between a machine and this run.
+      - name: Install
+        run: npm ci
+
+      - name: Types
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      # Last, because it is the slowest and the three checks above catch most
+      # of what would break it. It is here at all because tsc and Vitest can
+      # both pass on a bundle that fails to build.
+      - name: Build
+        run: npm run build
