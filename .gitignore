@@ -1,0 +1,13 @@
+# Assignment brief (kept locally, not part of the solution)
+assignment.txt
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Environment
+.env
+.env.*
+!.env.example
