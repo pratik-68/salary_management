@@ -36,6 +36,10 @@ npm run dev
 
 The dev server proxies `/api` to the backend, so both run on one origin.
 
+Open http://localhost:5173 and sign in as the seeded HR Manager:
+`hr@example.com` / `password123`. Both come from `HR_MANAGER_EMAIL` and
+`HR_MANAGER_PASSWORD`, which is how a deployment would set its own.
+
 ## Checks
 
 ```bash
