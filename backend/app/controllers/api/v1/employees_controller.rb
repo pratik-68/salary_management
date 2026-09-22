@@ -26,10 +26,41 @@ module Api
         render json: { data: EmployeeSerializer.one(employee) }
       end
 
+      # POST /api/v1/employees
+      def create
+        new_employee = Employee.new(employee_params)
+
+        if new_employee.save
+          render json: { data: EmployeeSerializer.one(new_employee) }, status: :created
+        else
+          render_invalid(new_employee)
+        end
+      end
+
+      # PATCH /api/v1/employees/:id
+      def update
+        if employee.update(employee_params)
+          render json: { data: EmployeeSerializer.one(employee) }
+        else
+          render_invalid(employee)
+        end
+      end
+
       private
 
       def employee
         @employee ||= Employee.find(params[:id])
+      end
+
+      # Currency is deliberately absent: it is derived from the country, so
+      # accepting it would let the two disagree.
+      def employee_params
+        params.expect(
+          employee: %i[
+            employee_code first_name last_name email country_code
+            department job_title level annual_salary hire_date
+          ]
+        )
       end
 
       def page_number

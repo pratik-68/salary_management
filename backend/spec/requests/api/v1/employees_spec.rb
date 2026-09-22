@@ -137,6 +137,106 @@ RSpec.describe "Api::V1::Employees", type: :request do
     end
   end
 
+  describe "POST /api/v1/employees" do
+    let(:attributes) do
+      {
+        employee_code: "EMP-99001",
+        first_name: "Grace",
+        last_name: "Hopper",
+        email: "grace@example.com",
+        country_code: "US",
+        department: "Engineering",
+        job_title: "Software Engineer",
+        level: "L5",
+        annual_salary: 190_000,
+        hire_date: "2021-06-01"
+      }
+    end
+
+    it "creates the employee and returns it" do
+      expect { post "/api/v1/employees", params: { employee: attributes }, as: :json }
+        .to change(Employee, :count).by(1)
+
+      expect(response).to have_http_status(:created)
+      expect(data).to include("employee_code" => "EMP-99001", "currency" => "USD", "annual_salary" => 190_000)
+    end
+
+    it "returns per-field messages when the record is invalid" do
+      post "/api/v1/employees", params: { employee: attributes.merge(annual_salary: 0, email: "not-an-email") }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to include("annual_salary", "email")
+      expect(response.parsed_body["errors"]["annual_salary"]).to be_an(Array)
+    end
+
+    it "rejects a job title that does not belong to the department" do
+      post "/api/v1/employees", params: { employee: attributes.merge(department: "Finance") }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to have_key("job_title")
+    end
+
+    it "creates nothing when the record is invalid" do
+      expect { post "/api/v1/employees", params: { employee: attributes.merge(country_code: "ZZ") }, as: :json }
+        .not_to change(Employee, :count)
+    end
+
+    it "returns 400 when the employee object is missing" do
+      post "/api/v1/employees", params: { first_name: "Grace" }, as: :json
+
+      expect(response).to have_http_status(:bad_request)
+      expect(error_code).to eq("invalid_params")
+    end
+
+    it "ignores attributes that are not the client's to set" do
+      post "/api/v1/employees", params: { employee: attributes.merge(id: 12_345) }, as: :json
+
+      expect(response).to have_http_status(:created)
+      expect(data["id"]).not_to eq(12_345)
+    end
+  end
+
+  describe "PATCH /api/v1/employees/:id" do
+    let(:employee) { create(:employee, annual_salary: 2_400_000) }
+
+    it "updates the given fields and leaves the rest alone" do
+      patch "/api/v1/employees/#{employee.id}", params: { employee: { annual_salary: 2_700_000 } }, as: :json
+
+      expect(response).to have_http_status(:ok)
+      expect(data).to include("annual_salary" => 2_700_000, "first_name" => "Ada")
+      expect(employee.reload.annual_salary).to eq(2_700_000)
+    end
+
+    it "changes the currency with the country" do
+      patch "/api/v1/employees/#{employee.id}", params: { employee: { country_code: "DE", annual_salary: 85_000 } }, as: :json
+
+      expect(data).to include("country_code" => "DE", "currency" => "EUR")
+    end
+
+    it "returns 422 and keeps the record unchanged when invalid" do
+      patch "/api/v1/employees/#{employee.id}", params: { employee: { annual_salary: -1 } }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to have_key("annual_salary")
+      expect(employee.reload.annual_salary).to eq(2_400_000)
+    end
+
+    it "rejects an email already used by someone else" do
+      create(:employee, email: "taken@example.com")
+
+      patch "/api/v1/employees/#{employee.id}", params: { employee: { email: "taken@example.com" } }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body["errors"]).to have_key("email")
+    end
+
+    it "returns 404 for an unknown id" do
+      patch "/api/v1/employees/0", params: { employee: { annual_salary: 1 } }, as: :json
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   describe "without a session" do
     before { delete "/api/v1/session" }
 
@@ -145,13 +245,23 @@ RSpec.describe "Api::V1::Employees", type: :request do
 
       [
         -> { get "/api/v1/employees" },
-        -> { get "/api/v1/employees/#{employee.id}" }
+        -> { get "/api/v1/employees/#{employee.id}" },
+        -> { post "/api/v1/employees", params: { employee: { first_name: "Grace" } }, as: :json },
+        -> { patch "/api/v1/employees/#{employee.id}", params: { employee: { first_name: "Grace" } }, as: :json }
       ].each do |request|
         request.call
 
         expect(response).to have_http_status(:unauthorized)
         expect(error_code).to eq("unauthorized")
       end
+    end
+
+    it "changes nothing" do
+      employee = create(:employee, first_name: "Ada")
+
+      patch "/api/v1/employees/#{employee.id}", params: { employee: { first_name: "Grace" } }, as: :json
+
+      expect(employee.reload.first_name).to eq("Ada")
     end
   end
 end

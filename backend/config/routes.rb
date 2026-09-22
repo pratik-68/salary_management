@@ -7,7 +7,9 @@ Rails.application.routes.draw do
       #   DELETE /api/v1/session  -> sign out
       resource :session, only: %i[show create destroy]
 
-      resources :employees, only: %i[index show]
+      # No destroy: someone leaving should be recorded, not erased. See the
+      # exclusions in docs/REQUIREMENTS.md.
+      resources :employees, only: %i[index show create update]
     end
   end
 

@@ -12,6 +12,7 @@ module ErrorResponses
   included do
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
     rescue_from InvalidParams, with: :render_invalid_params
+    rescue_from ActionController::ParameterMissing, with: :render_parameter_missing
   end
 
   private
@@ -29,6 +30,10 @@ module ErrorResponses
   # ignoring the parameter.
   def render_invalid_params(error)
     render_error(:bad_request, code: error.code, message: error.message)
+  end
+
+  def render_parameter_missing(error)
+    render_error(:bad_request, code: "invalid_params", message: "Missing required parameter: #{error.param}.")
   end
 
   def render_invalid(record)
