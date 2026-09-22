@@ -1,11 +1,25 @@
 import { render, screen } from '@testing-library/react'
-import { expect, test } from 'vitest'
+import { afterEach, expect, test, vi } from 'vitest'
 import App from './App'
 
-test('renders the application heading', () => {
+afterEach(() => {
+  vi.restoreAllMocks()
+  window.history.pushState({}, '', '/')
+})
+
+test('opens on the employee list', async () => {
+  signedIn()
+
   render(<App />)
 
-  expect(
-    screen.getByRole('heading', { name: 'Salary Management' }),
-  ).toBeInTheDocument()
+  expect(await screen.findByRole('heading', { name: 'Employees', level: 3 })).toBeInTheDocument()
 })
+
+function signedIn(): void {
+  vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+    new Response(JSON.stringify({ data: { id: 1, email_address: 'hr@example.com' } }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  )
+}
