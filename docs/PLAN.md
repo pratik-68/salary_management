@@ -199,7 +199,7 @@ Each milestone ends green and is made of small commits (conventional-commit styl
 | 8 | Frontend skeleton | Vite + TS + Ant Design, router, layout, API client, dev proxy, login page and route guard | `chore(frontend): scaffold Vite React TS app with Ant Design`, `feat(ui): login page and auth guard` |
 | 9 | Employees UI | Table, filters, search, URL state, create/edit drawer | `feat(ui): employee list with filters and URL state`, `feat(ui): create/edit employee drawer` |
 | 10 | Insights UI | Pay-by-country table, within-country breakdown with group-by toggle and chart | `feat(ui): pay by country`, `feat(ui): pay within a country` |
-| 11 | Quality and docs | Frontend tests, GitHub Actions CI (RSpec, RuboCop, ESLint, `tsc`, Vitest), README, `ARCHITECTURE.md` with measured timings, `AI_USAGE.md` | `ci: run backend and frontend checks`, `docs: architecture and trade-offs` |
+| 11 | Quality and docs | Frontend tests, GitHub Actions CI (RSpec, RuboCop, oxlint, `tsc`, Vitest), README, `ARCHITECTURE.md` with measured timings, `AI_USAGE.md` | `ci: run backend and frontend checks`, `docs: architecture and trade-offs` |
 
 **Descoping order, if needed:**
 
