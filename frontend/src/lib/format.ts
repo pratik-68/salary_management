@@ -17,6 +17,11 @@ const moneyFormatters = new Map<string, Intl.NumberFormat>()
 
 const countFormatter = new Intl.NumberFormat(LOCALE)
 
+const compactFormatter = new Intl.NumberFormat(LOCALE, {
+  notation: 'compact',
+  maximumFractionDigits: 1,
+})
+
 const dateFormatter = new Intl.DateTimeFormat(LOCALE, { dateStyle: 'medium', timeZone: 'UTC' })
 
 /** e.g. formatMoney(2_400_000, 'INR') -> "INR 2,400,000" */
@@ -32,6 +37,17 @@ export function formatMoney(amount: number, currency: string): string {
 
 export function formatCount(value: number): string {
   return countFormatter.format(value)
+}
+
+/**
+ * A number short enough for a chart axis, e.g. 2_400_000 -> "2.4M".
+ *
+ * No currency on it: an axis repeats its labels, so the currency is named once
+ * in the chart's title instead, and the tooltip and the table beside it give
+ * each figure in full.
+ */
+export function formatCompactNumber(value: number): string {
+  return compactFormatter.format(value)
 }
 
 /** An ISO date from the API, e.g. "2021-06-01" -> "1 Jun 2021". */
