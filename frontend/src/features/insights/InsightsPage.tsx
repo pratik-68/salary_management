@@ -1,16 +1,17 @@
-import { Alert, Typography } from 'antd'
+// What the pay data says, in two views.
 
-// A placeholder, as with the employee list.
+import { Typography } from 'antd'
+import PayByCountry from './PayByCountry'
+
 export default function InsightsPage() {
   return (
     <>
-      <Typography.Title level={3}>Insights</Typography.Title>
-      <Alert
-        type="info"
-        showIcon
-        message="Pay insights are next"
-        description="Pay by country, and pay within one country by department, job title or level — every figure in its own currency, none of them converted."
-      />
+      <Typography.Title level={3} style={{ marginTop: 0 }}>
+        Insights
+      </Typography.Title>
+
+      <Typography.Title level={5}>Pay by country</Typography.Title>
+      <PayByCountry />
     </>
   )
 }

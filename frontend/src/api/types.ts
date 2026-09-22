@@ -109,3 +109,54 @@ export interface EmployeeInput {
   annual_salary: number
   hire_date: string
 }
+
+/**
+ * What a pay breakdown is grouped by.
+ *
+ * Anything but `country` needs a country filter: a median for "Engineering"
+ * across eight currencies is not a number that means anything.
+ */
+export type BreakdownGroupBy = 'country' | 'department' | 'job_title' | 'level'
+
+/**
+ * One group's pay, every figure of it in `currency`.
+ *
+ * `group` is the value grouped on — a country code, a department, a job title
+ * or a level. `median` and `average` arrive already rounded to whole units of
+ * that currency. Every row has at least one employee behind it, since a group
+ * with nobody in it is not a row the API can produce.
+ */
+export interface BreakdownRow {
+  group: string
+  country_code: string | null
+  country_name: string | null
+  currency: string | null
+  headcount: number
+  min: number
+  median: number
+  average: number
+  max: number
+  total: number
+}
+
+/** `currency` is the one every row shares, or null when the rows span countries. */
+export interface BreakdownMeta {
+  group_by: BreakdownGroupBy
+  country: string | null
+  currency: string | null
+  headcount: number
+}
+
+export interface Breakdown {
+  data: BreakdownRow[]
+  meta: BreakdownMeta
+}
+
+/** The same filters as the employee list, plus what to group the rows by. */
+export interface BreakdownParams {
+  group_by: BreakdownGroupBy
+  country?: string
+  department?: string
+  job_title?: string
+  level?: string
+}
