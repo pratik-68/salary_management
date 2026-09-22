@@ -201,8 +201,15 @@ export default function EmployeeFormDrawer({ open, employee, onClose }: Props) {
         <Form.Item
           label="Annual salary"
           name="annual_salary"
-          rules={[{ required: true, message: 'Enter an annual salary.' }]}
+          rules={[
+            { required: true, message: 'Enter an annual salary.' },
+            { type: 'number', min: 1, message: 'A salary has to be more than zero.' },
+          ]}
         >
+          {/* No thousands separator while typing: a parser that groups the
+              digits has to turn an emptied field into some number, and it
+              would rather quietly save 0 than leave the field blank. The
+              table does the grouping, where there is nothing to type. */}
           <InputNumber<number>
             min={1}
             precision={0}
@@ -210,8 +217,6 @@ export default function EmployeeFormDrawer({ open, employee, onClose }: Props) {
             // Whole units of the country's own currency. Nothing here is ever
             // converted, so the code sits on the field itself.
             addonAfter={currency ?? '—'}
-            formatter={(value) => (value === undefined ? '' : withThousands(value))}
-            parser={(displayValue) => Number((displayValue ?? '').replace(/[^\d]/g, ''))}
           />
         </Form.Item>
 
@@ -268,8 +273,4 @@ function showServerErrors(
       errors: messages,
     })),
   )
-}
-
-function withThousands(value: number | string): string {
-  return `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
