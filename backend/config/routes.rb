@@ -10,6 +10,9 @@ Rails.application.routes.draw do
       # No destroy: someone leaving should be recorded, not erased. See the
       # exclusions in docs/REQUIREMENTS.md.
       resources :employees, only: %i[index show create update]
+
+      # The reference-data catalog behind the dropdowns.
+      resource :meta, only: :show
     end
   end
 
