@@ -42,6 +42,11 @@ RSpec.configure do |config|
   # as "hire date can't be in the future" never depend on when they are run.
   config.include ActiveSupport::Testing::TimeHelpers
 
+  # Rate-limit counters live in the cache, which is not rolled back with the
+  # database. Without this, one spec's sign-in attempts would count against the
+  # next one's.
+  config.before { Rails.cache.clear }
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')

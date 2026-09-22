@@ -40,5 +40,12 @@ module Backend
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
+
+    # Cookies are not in the API middleware stack, but the SPA is served from
+    # the same origin as this API and authenticates with a signed, httpOnly
+    # session cookie rather than a token in localStorage: the browser will not
+    # hand a cookie to JavaScript, and a session can be revoked server-side.
+    # No session middleware is added back — nothing here stores state in it.
+    config.middleware.use ActionDispatch::Cookies
   end
 end

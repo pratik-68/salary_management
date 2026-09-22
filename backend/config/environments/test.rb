@@ -20,7 +20,10 @@ Rails.application.configure do
 
   # Show full error reports.
   config.consider_all_requests_local = true
-  config.cache_store = :null_store
+  # A real store rather than :null_store so that the rate limit on sign-in is
+  # exercised by its spec instead of silently doing nothing. rails_helper
+  # clears it between examples.
+  config.cache_store = :memory_store
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable

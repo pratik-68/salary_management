@@ -16,6 +16,12 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false
 
+# Pinned to 2.x: json 3.0 made JSON.parse's options keyword-only, but
+# ActiveSupport::JSON.decode still passes them positionally, so every signed
+# cookie read raises ArgumentError. Rails 8.1 only requires json >= 2.3, so
+# bundler otherwise resolves to 3.x. Remove the pin once Rails supports it.
+gem "json", "~> 2.7"
+
 # Pagination for the employee list
 gem "pagy", "~> 9.3"
 
