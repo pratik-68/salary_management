@@ -1,0 +1,80 @@
+# Reference data catalog.
+#
+# These values change rarely and there is no admin UI for them, so they live in
+# code rather than in database tables. Employee records are validated against
+# this catalog, which keeps the analytics clean: free-text job titles would
+# fragment into near-duplicates and make "pay for this role" unanswerable.
+#
+# Adding a country, department, job title or level is a code change.
+
+# Each country has exactly one currency. Currency is derived from the country
+# and never stored on the employee, so the country is the single source of
+# truth. Salaries are never converted between these currencies.
+countries:
+  - code: IN
+    name: India
+    currency: INR
+  - code: US
+    name: United States
+    currency: USD
+  - code: GB
+    name: United Kingdom
+    currency: GBP
+  - code: DE
+    name: Germany
+    currency: EUR
+  - code: PL
+    name: Poland
+    currency: PLN
+  - code: SG
+    name: Singapore
+    currency: SGD
+  - code: AU
+    name: Australia
+    currency: AUD
+  - code: BR
+    name: Brazil
+    currency: BRL
+
+# Job titles belong to a department: an employee's title must be one of the
+# titles listed under their department.
+departments:
+  Engineering:
+    - Software Engineer
+    - QA Engineer
+    - DevOps Engineer
+    - Data Engineer
+    - Engineering Manager
+  Product:
+    - Product Manager
+    - Product Designer
+    - UX Researcher
+  Sales:
+    - Account Executive
+    - Sales Development Representative
+    - Sales Manager
+  Marketing:
+    - Marketing Manager
+    - Content Strategist
+    - Growth Marketer
+  Finance:
+    - Financial Analyst
+    - Accountant
+    - Finance Manager
+  People:
+    - Recruiter
+    - HR Business Partner
+    - People Operations Manager
+  Customer Success:
+    - Customer Success Manager
+    - Support Engineer
+    - Support Team Lead
+
+# Seniority, lowest first. The order matters: insights group and sort by it.
+levels:
+  - L1
+  - L2
+  - L3
+  - L4
+  - L5
+  - L6
