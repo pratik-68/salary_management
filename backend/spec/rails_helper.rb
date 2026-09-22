@@ -38,6 +38,10 @@ RSpec.configure do |config|
   # Lets specs call `build`/`create` directly instead of `FactoryBot.build`.
   config.include FactoryBot::Syntax::Methods
 
+  # Lets specs freeze the clock with `travel_to`, so date-sensitive rules such
+  # as "hire date can't be in the future" never depend on when they are run.
+  config.include ActiveSupport::Testing::TimeHelpers
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
