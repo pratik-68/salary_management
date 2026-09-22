@@ -5,7 +5,7 @@ RSpec.describe "Api::V1::Sessions", type: :request do
   let!(:user) { create(:user, email_address: "hr@example.com", password: password) }
 
   def sign_in(email: user.email_address, with: password)
-    post "/api/v1/session", params: { email_address: email, password: with }
+    post "/api/v1/session", params: { email_address: email, password: with }, as: :json
   end
 
   describe "POST /api/v1/session" do

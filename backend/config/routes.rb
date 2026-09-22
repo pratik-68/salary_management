@@ -6,6 +6,8 @@ Rails.application.routes.draw do
       #   POST   /api/v1/session  -> sign in
       #   DELETE /api/v1/session  -> sign out
       resource :session, only: %i[show create destroy]
+
+      resources :employees, only: %i[index show]
     end
   end
 

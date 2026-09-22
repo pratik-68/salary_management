@@ -11,6 +11,7 @@ module ErrorResponses
 
   included do
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+    rescue_from InvalidParams, with: :render_invalid_params
   end
 
   private
@@ -21,6 +22,13 @@ module ErrorResponses
 
   def render_not_found(_error = nil)
     render_error(:not_found, code: "not_found", message: "We couldn't find what you asked for.")
+  end
+
+  # A request we can't make sense of: an unknown sort column, a filter value
+  # that isn't in the catalog. The filter raises these rather than quietly
+  # ignoring the parameter.
+  def render_invalid_params(error)
+    render_error(:bad_request, code: error.code, message: error.message)
   end
 
   def render_invalid(record)
