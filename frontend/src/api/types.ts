@@ -17,3 +17,76 @@ export interface User {
   id: number
   email_address: string
 }
+
+export interface PageMeta {
+  page: number
+  per_page: number
+  total: number
+}
+
+export interface Page<T> {
+  data: T[]
+  meta: PageMeta
+}
+
+/**
+ * An employee as the API sends them.
+ *
+ * `country_name` and `currency` are not stored on the record: the API derives
+ * them from the country so that every salary arrives already labelled, rather
+ * than each screen having to look the currency up for itself.
+ */
+export interface Employee {
+  id: number
+  employee_code: string
+  first_name: string
+  last_name: string
+  full_name: string
+  email: string
+  country_code: string
+  country_name: string | null
+  currency: string | null
+  department: string
+  job_title: string
+  level: string
+  annual_salary: number
+  hire_date: string
+}
+
+export type SortDirection = 'asc' | 'desc'
+
+/**
+ * Everything that decides which employees are on screen. It is the API's query
+ * string, the React Query cache key and the app's own URL, all one object, so
+ * a view can be bookmarked and shared and comes back exactly as it was.
+ */
+export interface EmployeeListParams {
+  q?: string
+  country?: string
+  department?: string
+  job_title?: string
+  level?: string
+  sort: string
+  direction: SortDirection
+  page: number
+  per_page: number
+}
+
+/** The catalog behind every dropdown: what the API will accept. */
+export interface Country {
+  code: string
+  name: string
+  currency: string
+}
+
+export interface DepartmentCatalog {
+  name: string
+  job_titles: string[]
+}
+
+export interface ReferenceData {
+  countries: Country[]
+  departments: DepartmentCatalog[]
+  job_titles: string[]
+  levels: string[]
+}

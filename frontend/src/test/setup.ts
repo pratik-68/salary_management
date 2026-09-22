@@ -14,3 +14,12 @@ window.matchMedia ??= (query: string): MediaQueryList =>
     removeEventListener: () => {},
     dispatchEvent: () => false,
   }) as MediaQueryList
+
+// Nor does jsdom have ResizeObserver, which Ant Design's Table uses to watch
+// its container. Nothing here is under test at a particular size, so a
+// no-op stands in.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver
